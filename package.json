@@ -1,0 +1,134 @@
+{
+  "name": "mujing-studio",
+  "version": "0.7.12",
+  "description": "幕境 AI 视频创作工作台桌面版",
+  "author": "幕境 Studio",
+  "private": true,
+  "main": "desktop/main.cjs",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "vinext dev",
+    "build": "vinext build",
+    "start": "vinext start",
+    "desktop:dev": "npm run build && electron .",
+    "desktop:build": "npm run build && electron-builder --win nsis",
+    "desktop:portable": "npm run build && electron-builder --win portable",
+    "desktop:mac-arm64": "npm run build && npm run prepare:mac-arm64 && electron-builder --mac dmg zip --arm64",
+    "prepare:mac-arm64": "node scripts/prepare-macos-arm64-media.mjs",
+    "e2e:demo": "npm run build && node scripts/e2e/run-demo-e2e.mjs --fixture=tests/fixtures/core-journey-zh.txt --evidence=C:/Users/Mr.X/hermes-output/mujing-0.4.0/e2e-evidence",
+    "e2e:fake-live": "npm run build && node scripts/e2e/run-fake-live.mjs --fixture=tests/fixtures/core-journey-zh.txt --evidence=C:/Users/Mr.X/hermes-output/mujing-0.4.0/e2e-evidence",
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
+    "db:generate": "drizzle-kit generate"
+  },
+  "dependencies": {
+    "drizzle-orm": "0.45.2",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "1.37.1",
+    "@eslint/js": "9.39.4",
+    "@next/eslint-plugin-next": "16.2.6",
+    "@openai/sites-vite-plugin": "0.1.0",
+    "@tailwindcss/postcss": "4.2.1",
+    "@types/node": "22.19.19",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.2",
+    "@vitejs/plugin-rsc": "0.5.26",
+    "drizzle-kit": "0.31.10",
+    "electron": "^43.4.0",
+    "electron-builder": "^26.15.3",
+    "eslint": "9.39.4",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "ffmpeg-static": "^5.3.0",
+    "ffprobe-static": "^3.1.0",
+    "globals": "16.4.0",
+    "react-server-dom-webpack": "19.2.6",
+    "tailwindcss": "4.2.1",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.59.3",
+    "vinext": "1.0.0-beta.2",
+    "vite": "8.0.13",
+    "wrangler": "4.92.0"
+  },
+  "build": {
+    "appId": "studio.mujing.video",
+    "productName": "幕境",
+    "asar": true,
+    "asarUnpack": [
+      "dist/**/*"
+    ],
+
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "desktop/**/*",
+      "dist/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "scripts/local-video-service",
+        "to": "local-video-service"
+      }
+    ],
+    "win": {
+      "artifactName": "MuJing-Setup-${version}.${ext}",
+      "target": [
+        "nsis"
+      ],
+      "executableName": "MuJing",
+      "extraResources": [
+        {
+          "from": "node_modules/ffmpeg-static/ffmpeg.exe",
+          "to": "ffmpeg.exe"
+        },
+        {
+          "from": "node_modules/ffprobe-static/bin/win32/x64/ffprobe.exe",
+          "to": "ffprobe.exe"
+        }
+      ]
+    },
+    "mac": {
+      "artifactName": "MuJing-${version}-macOS-Apple-Silicon-arm64.${ext}",
+      "category": "public.app-category.video",
+      "identity": null,
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["arm64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["arm64"]
+        }
+      ],
+      "extraResources": [
+        {
+          "from": "build/macos-arm64/ffmpeg",
+          "to": "ffmpeg"
+        },
+        {
+          "from": "build/macos-arm64/ffprobe",
+          "to": "ffprobe"
+        }
+      ]
+    },
+    "nsis": {
+      "include": "build/installer.nsh",
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "幕境"
+    }
+  },
+  "type": "module"
+}

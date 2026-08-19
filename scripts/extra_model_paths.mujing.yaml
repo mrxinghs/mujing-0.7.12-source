@@ -1,0 +1,5 @@
+mujing_wan22:
+  base_path: D:/MuJing-ComfyUI-Models
+  diffusion_models: diffusion_models
+  text_encoders: text_encoders
+  vae: vae
